@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
+import it.prova.gestionesocieta.exceptions.SocietaHasDipendentiException;
 import it.prova.gestionesocieta.model.Dipendente;
 import it.prova.gestionesocieta.model.Societa;
 import it.prova.gestionesocieta.repository.DipendenteRepository;
@@ -52,18 +53,12 @@ public class SocietaServiceImpl implements SocietaService {
 	}
 
 	@Transactional
-	public void rimuoviSocieta(Long idSocieta) throws Exception {
-
-		Societa societa = societaRepository.findById(idSocieta).orElseThrow(() -> new Exception("Società non trovata"));
-
-		List<Dipendente> dipendenti = dipendenteRepository.findBySocieta(societa);
-
-		if (!dipendenti.isEmpty()) {
-			throw new Exception("Impossibile rimuovere la Società perché ha Dipendenti");
+	public void rimuoviSocieta(Long idSocieta) throws SocietaHasDipendentiException {
+		Societa societaInstance = societaRepository.findByIdEager(idSocieta);
+		if (societaInstance.getDipendenti().size() > 0) {
+			throw new SocietaHasDipendentiException("Errore: stai rimuovendo una societa con dipendenti associati");
 		}
-
-		societaRepository.delete(societa);
-
+		societaRepository.deleteById(idSocieta);
 	}
 
 	@Override

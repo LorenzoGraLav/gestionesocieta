@@ -1,9 +1,8 @@
 package it.prova.gestionesocieta.repository;
 
-import java.time.LocalDate;
+
 import java.util.List;
 
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.QueryByExampleExecutor;
 

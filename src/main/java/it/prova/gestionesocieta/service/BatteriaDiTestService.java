@@ -4,10 +4,12 @@ import java.time.LocalDate;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import it.prova.gestionesocieta.exceptions.SocietaHasDipendentiException;
 import it.prova.gestionesocieta.model.Dipendente;
 import it.prova.gestionesocieta.model.Societa;
 
@@ -71,6 +73,31 @@ public class BatteriaDiTestService {
 		List<Societa> listasocieta = societaService.findByExample(societaDaCercare);
 
 		System.out.println(listasocieta);
+	}
+	
+	
+	
+
+	public void testRimozioneSocieta() throws Exception {
+		System.out.println("testRimozioneSocieta INIZIO");
+		Long nowInMillisecondi = new Date().getTime();
+		Societa nuovaSocieta = new Societa("Societa " + nowInMillisecondi, "Via " + nowInMillisecondi, LocalDate.now());
+		societaService.inserisciNuovo(nuovaSocieta);
+		if (nuovaSocieta.getId() == null || nuovaSocieta.getId() < 1) {
+			throw new RuntimeException("testRimozioneSocieta FALLITO: inserimento fallito");
+		}
+		IntStream.range(1, 5).forEach(i -> {
+			Dipendente dipendente = new Dipendente("Mario" +i, "Rossi"+i,LocalDate.now(), 35+(i*2), nuovaSocieta);
+			dipendenteService.inserisciNuovo(dipendente);;
+		});
+		
+		try {
+			societaService.rimuoviSocieta(nuovaSocieta.getId());
+			throw new RuntimeException("testRimozioneSocieta FALLITO: non è stata l'eccezione custom");
+		} catch (SocietaHasDipendentiException e) {
+			System.out.println("Catched Custom Exception");
+		}
+		System.out.println("testRimozioneSocieta PASSED");
 	}
 
 	public void testAggiornaDipendente() {

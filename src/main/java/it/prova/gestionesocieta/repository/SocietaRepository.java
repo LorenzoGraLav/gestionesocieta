@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.QueryByExampleExecutor;
 
@@ -15,4 +16,6 @@ public interface SocietaRepository extends CrudRepository<Societa, Long>,QueryBy
 	@EntityGraph(attributePaths = {"dipendenti"})
 	List<Societa> findAllDistinctByDipendenti_RedditoAnnuoLordoGreaterThan (int redditoAnnuo);
     List<Societa> findByDataFondazioneBefore(LocalDate dataFondazione);
+    @Query("select s from Societa s join fetch s.dipendenti where s.id =?1")
+	public Societa findByIdEager(Long id);
 }
